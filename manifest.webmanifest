@@ -1,0 +1,12 @@
+{
+  "id": "./",
+  "name": "Para Elieth, com amor",
+  "short_name": "Para Elieth",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#20171e",
+  "theme_color": "#20171e",
+  "icons": [{"src":"assets/touch-icon.png","sizes":"180x180","type":"image/png"}]
+}
