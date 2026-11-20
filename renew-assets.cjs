@@ -2,7 +2,7 @@
 const fs = require('fs');
 const crypto = require('crypto');
 let html = fs.readFileSync('index.html','utf8');
-for (const file of (process.argv.includes('--og-only') ? [] : ['styles.css','app.js'])) {
+for (const file of (process.argv.includes('--og-only') ? [] : ['styles.css','app.js','mural.js'])) {
   const token = crypto.randomBytes(8).toString('hex');
   const pattern = new RegExp(file.replace('.', '\\.') + '\\?v=[^"\\s]+','g');
   html = html.replace(pattern,`${file}?v=${token}`);

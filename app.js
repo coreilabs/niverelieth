@@ -15,6 +15,9 @@ const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 const frames = new Map();
 const TRANSITION_SECONDS = 1.45;
 let controlsTimer = 0, noticeTimer = 0, keyboardNavigation = false, sharing = false;
+let scrubbing = false, scrubWasPlaying = false;
+const seekControl = $('seek');
+const formatTime = value => `${Math.floor(value/60)}:${String(Math.floor(value%60)).padStart(2,'0')}`;
 const canFullscreen = !!((document.fullscreenEnabled && document.documentElement.requestFullscreen) || (document.webkitFullscreenEnabled && document.documentElement.webkitRequestFullscreen));
 $('fullscreen').hidden = !canFullscreen;
 function requestFullscreen() {
@@ -159,7 +162,6 @@ function playbackUi() {
   $('pause').querySelector('use').setAttribute('href',audio.paused ? '#icon-play' : '#icon-pause');
   $('pause').setAttribute('aria-label',audio.paused ? 'Continuar homenagem' : 'Pausar homenagem');
   $('stage-toggle').setAttribute('aria-label',audio.paused ? 'Continuar homenagem' : 'Pausar homenagem');
-  document.querySelector('.tap-hint').textContent = audio.paused ? 'toque na foto para continuar' : 'toque na foto para pausar';
   $('experience').classList.toggle('is-paused',audio.paused);
   showControls();
 }
@@ -182,8 +184,9 @@ function update() {
   }
   const progress = Math.min(t,VOICE_END);
   $('progress-fill').style.width = `${progress/VOICE_END*100}%`;
-  $('player').querySelector('[role=progressbar]').setAttribute('aria-valuenow',Math.floor(progress));
-  const timeLabel = end ? '♫ <span>A música continua</span>' : `${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')} <span>/ 2:00</span>`;
+  if (!scrubbing) seekControl.value = String(progress);
+  seekControl.setAttribute('aria-valuetext',`${formatTime(progress)} de ${formatTime(VOICE_END)}`);
+  const timeLabel = `${formatTime(progress)} <span>/ ${formatTime(VOICE_END)}</span>${end ? ' <span aria-label="A música continua">♫</span>' : ''}`;
   if ($('time').innerHTML !== timeLabel) $('time').innerHTML = timeLabel;
 }
 function tick() { update(); if (!audio.paused) raf = requestAnimationFrame(tick); }
@@ -208,6 +211,8 @@ audio.addEventListener('play',() => { cancelAnimationFrame(raf); tick(); playbac
 audio.addEventListener('pause',() => { cancelAnimationFrame(raf); update(); playbackUi(); });
 audio.addEventListener('timeupdate',update);
 audio.addEventListener('seeked',update);
+audio.addEventListener('loadedmetadata',() => { seekControl.disabled = false; });
+if (audio.readyState>=1) seekControl.disabled = false;
 audio.addEventListener('error',() => { notify('O áudio não carregou. Confira sua conexão e toque para tentar novamente.'); $('start-label').textContent = 'Tentar novamente'; });
 audio.addEventListener('ended',() => {
   // Only the instrumental section repeats; the spoken letter never restarts itself.
@@ -242,11 +247,36 @@ $('captions').addEventListener('change',() => {
   $('caption').style.visibility = enabled ? 'visible' : 'hidden';
   showControls();
 });
-$('replay').addEventListener('click',() => {
-  audio.currentTime = 0; sceneIndex = -1; captionIndex = -1; update();
+function seekTo(value) {
+  if (!Number.isFinite(value) || !Number.isFinite(audio.duration)) return;
+  audio.currentTime = Math.max(0,Math.min(value,VOICE_END,audio.duration));
+  update(); showControls();
+}
+function beginScrub() {
+  if (scrubbing || seekControl.disabled) return;
+  scrubbing = true; scrubWasPlaying = !audio.paused;
+  audio.pause(); showControls();
+}
+function finishScrub(resume = true) {
+  if (!scrubbing) return;
+  const shouldResume = resume && scrubWasPlaying;
+  scrubbing = false; scrubWasPlaying = false;
+  update(); showControls();
+  if (shouldResume && !document.hidden) audio.play().catch(() => notify('Toque em continuar para ouvir a homenagem.'));
+}
+seekControl.addEventListener('pointerdown',beginScrub);
+seekControl.addEventListener('input',() => seekTo(Number(seekControl.value)));
+seekControl.addEventListener('change',() => finishScrub());
+window.addEventListener('pointerup',() => finishScrub());
+window.addEventListener('pointercancel',() => finishScrub());
+function restartPresentation() {
+  finishScrub(false); sceneIndex = -1; captionIndex = -1;
+  seekTo(0); notify('');
   audio.play().catch(() => notify('Toque em continuar para recomeçar.'));
-});
-document.addEventListener('visibilitychange',() => { if (document.hidden && started) audio.pause(); });
+}
+$('restart').addEventListener('click',restartPresentation);
+$('replay').addEventListener('click',restartPresentation);
+document.addEventListener('visibilitychange',() => { if (document.hidden && started) { finishScrub(false); audio.pause(); } });
 motionPreference.addEventListener?.('change',update);
 
 async function sharePage() {

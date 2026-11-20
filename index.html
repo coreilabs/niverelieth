@@ -35,9 +35,10 @@
   <meta name="twitter:title" content="Elieth, hoje é o seu dia!">
   <meta name="twitter:description" content="21 de novembro. Uma homenagem com nossas memórias e todo o amor que você merece.">
   <meta name="twitter:image" content="https://coreilabs.github.io/niverelieth/assets/opengraph.webp?v=8b03ed40181c807e">
-  <link rel="stylesheet" href="styles.css?v=20e2824083e43363">
+  <link rel="stylesheet" href="styles.css?v=b971fef5c34d5125">
   <link rel="preload" as="image" href="assets/imgs/2367ac94-e6b7-43d6-a345-f6b892683c45.webp">
-  <script src="app.js?v=6e53467869b7ec37" defer></script>
+  <script src="app.js?v=48929b1702c2928d" defer></script>
+  <script src="mural.js?v=f4fbdc0dcbd744b9" defer></script>
 </head>
 <body>
   <main class="experience" id="experience">
@@ -56,6 +57,7 @@
         <h1 id="cover-title">Hoje é o seu dia,<br><em>mãe.</em></h1>
         <p class="dedication">Algumas lembranças. Uma promessa.<br>E todo o meu amor por você.</p>
         <button class="primary" id="start" disabled><span aria-hidden="true">▷</span> <span id="start-label">Preparando seu presente…</span></button>
+        <button class="mural-invite mural-open"><span class="mural-heart" aria-hidden="true"><svg class="icon"><use href="#icon-heart"/></svg></span><span><strong>Mural de carinho</strong><small>Deixe sua mensagem para Elieth</small></span><span class="mural-arrow" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-up-right"/></svg></span></button>
         <p class="sound-hint">Ligue o som. Este momento é seu.</p>
         <div class="cover-links"><button class="text-button share-page"><svg class="icon"><use href="#icon-share"/></svg>Compartilhar</button><a class="text-button download-video" href="assets/video/eliethmoreira.mp4" download="Feliz-aniversario-Elieth.mp4"><svg class="icon"><use href="#icon-download"/></svg>Baixar vídeo</a></div>
       </div>
@@ -67,12 +69,12 @@
       <div class="dust" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       <div class="scene" id="scene"></div>
       <button class="stage-hit" id="stage-toggle" aria-label="Pausar homenagem"><span class="stage-feedback" id="stage-feedback" aria-hidden="true"><svg class="icon"><use href="#icon-play"/></svg></span></button>
-      <header class="presentation-header auto-controls"><span>UM PRESENTE PARA <strong>Elieth</strong></span><div class="header-actions"><button class="round" id="fullscreen" aria-label="Entrar em tela cheia" hidden><svg class="icon"><use href="#icon-fullscreen"/></svg></button><button class="round share-page" aria-label="Compartilhar página"><svg class="icon"><use href="#icon-share"/></svg></button><button class="round" id="music" aria-label="Desligar o som" aria-pressed="false"><svg class="icon"><use href="#icon-volume"/></svg></button></div></header>
+      <header class="presentation-header"><button class="mural-header mural-open" aria-label="Abrir mural de carinho e deixar um recado"><span>UM CARINHO PARA ELIETH</span><strong><span class="mural-label">Mural de carinho</span><span class="mural-label-short">Mural</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"/></svg></strong></button><div class="header-actions auto-controls"><button class="round" id="fullscreen" aria-label="Entrar em tela cheia" hidden><svg class="icon"><use href="#icon-fullscreen"/></svg></button><button class="round share-page" aria-label="Compartilhar página"><svg class="icon"><use href="#icon-share"/></svg></button><button class="round" id="music" aria-label="Desligar o som" aria-pressed="false"><svg class="icon"><use href="#icon-volume"/></svg></button></div></header>
       <div class="chapter" id="chapter" aria-hidden="true"></div>
       <div class="caption-area" id="caption-area"><p id="caption"></p></div>
       <footer class="player auto-controls" id="player">
-        <div class="progress" role="progressbar" aria-label="Progresso da homenagem" aria-valuemin="0" aria-valuemax="120" aria-valuenow="0"><span id="progress-fill"></span></div>
-        <div class="player-row"><button class="round" id="pause" aria-label="Pausar homenagem"><svg class="icon"><use href="#icon-pause"/></svg></button><span id="time">0:00 <span>/ 2:00</span></span><span class="tap-hint">toque na foto para pausar</span></div>
+        <div class="progress"><span id="progress-fill" aria-hidden="true"></span><input id="seek" type="range" min="0" max="120.3" step="0.1" value="0" aria-label="Tempo da apresentação" aria-valuetext="0:00 de 2:00" disabled></div>
+        <div class="player-row"><button class="round" id="pause" aria-label="Pausar homenagem"><svg class="icon"><use href="#icon-pause"/></svg></button><span id="time">0:00 <span>/ 2:00</span></span><button class="text-button restart-button" id="restart" aria-label="Reiniciar apresentação"><svg class="icon"><use href="#icon-restart"/></svg>Reiniciar</button></div>
         <div class="player-tools"><label class="caption-switch"><input id="captions" type="checkbox" role="switch" checked><span class="switch-track" aria-hidden="true"></span><span id="captions-label">Desativar legendas</span></label><button class="text-button gallery-open">Suas Lembranças <span aria-hidden="true">↗</span></button></div>
       </footer>
       <section class="ending" id="ending" aria-labelledby="ending-title" hidden>
@@ -91,6 +93,30 @@
     <noscript><p class="notice">Ative o JavaScript para abrir esta homenagem.</p></noscript>
   </main>
 
+  <dialog id="mural" class="mural-dialog" aria-labelledby="mural-title">
+    <header class="mural-heading"><div><p class="eyebrow">PALAVRAS QUE ABRAÇAM</p><h2 id="mural-title">Mural de <em>carinho.</em></h2></div><button class="round" id="close-mural" aria-label="Fechar mural" autofocus>✕</button></header>
+    <div class="mural-scroll" id="mural-scroll">
+      <p class="mural-intro">Um lugar para celebrar Elieth com palavras.<br>Seu carinho aparece aqui assim que você enviar.</p>
+      <form id="mural-form" class="mural-form">
+        <h3 id="mural-form-title">Deixe seu carinho ♡</h3>
+        <label for="mural-name">Seu nome <span aria-hidden="true">*</span></label>
+        <input id="mural-name" name="nome" type="text" autocomplete="name" maxlength="80" placeholder="Como você se chama?" required>
+        <label for="mural-message">Sua mensagem <span aria-hidden="true">*</span></label>
+        <textarea id="mural-message" name="mensagem" rows="3" maxlength="1000" placeholder="Escreva algo especial para ela…" required aria-describedby="mural-counter"></textarea>
+        <div class="mural-field-meta"><span>Com carinho, do seu jeito.</span><span id="mural-counter">0 / 1000</span></div>
+        <button type="submit" class="primary" id="mural-submit">Publicar carinho <span aria-hidden="true">♡</span></button>
+        <button type="button" class="text-button" id="mural-cancel-edit" hidden>Cancelar edição</button>
+        <p class="mural-owner-hint" id="mural-owner-hint">Você pode editar e apagar seus recados neste mesmo navegador.</p>
+        <p class="mural-status" id="mural-status" role="status" aria-live="polite" hidden></p>
+      </form>
+      <section class="mural-messages" aria-labelledby="mural-messages-title">
+        <div class="mural-list-heading"><h3 id="mural-messages-title">Carinhos para Elieth</h3><button class="text-button" id="mural-refresh" aria-label="Atualizar recados">↻ Atualizar</button></div>
+        <p class="mural-list-status" id="mural-list-status" role="status">Carregando os carinhos…</p>
+        <div class="mural-list" id="mural-list"></div>
+        <button class="mural-more" id="mural-more" hidden>Ver mais recados</button>
+      </section>
+    </div>
+  </dialog>
   <dialog id="gallery" class="gallery-dialog" aria-labelledby="gallery-title">
     <header class="gallery-header"><div><p class="eyebrow">MOMENTOS QUE FLORESCEM</p><h2 id="gallery-title">Suas <em>Lembranças.</em></h2></div><button class="round" id="close-gallery" aria-label="Fechar álbum">✕</button></header>
     <p class="gallery-intro">Sorrisos, abraços e tanto para guardar no coração.</p>
@@ -108,6 +134,9 @@
     <symbol id="icon-muted" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5ZM16 9l6 6m0-6-6 6"/></symbol>
     <symbol id="icon-fullscreen" viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m6 0h6v-6"/></symbol>
     <symbol id="icon-exit-fullscreen" viewBox="0 0 24 24"><path d="M3 9h6V3m6 0v6h6M9 21v-6H3m18 0h-6v6"/></symbol>
+    <symbol id="icon-restart" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></symbol>
+    <symbol id="icon-arrow-up-right" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
+    <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 20 4.5 12.5C-1 7 6 1 12 7c6-6 13 0 7.5 5.5Z"/></symbol>
   </defs></svg>
 </body>
 </html>
